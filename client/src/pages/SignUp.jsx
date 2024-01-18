@@ -14,12 +14,10 @@ const SignUp = () => {
     setFormData({...formData, [e.target.id]: e.target.value.trim() })
   }
 
-  console.log(errorMesage)
-
   const handleSubmit = async(e) => {
     e.preventDefault();
-    if(!formData.username || !formData.email || formData.password){
-      setErrorMessage('Please fill all fields!');
+    if(!formData.username || !formData.email || !formData.password){
+      return setErrorMessage('Please fill all fields!');
     }
     
     try {
