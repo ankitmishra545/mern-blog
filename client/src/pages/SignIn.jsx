@@ -3,6 +3,7 @@ import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
+import OAuth from '../components/OAuth';
 
 const SignIn = () => {
 
@@ -11,8 +12,6 @@ const SignIn = () => {
   const { currentUser, error, loading } = useSelector(state => state.user);
 
   const [formData, setFormData] = useState({});
-
-  console.log(currentUser)
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.id]: e.target.value.trim() })
@@ -74,6 +73,7 @@ const SignIn = () => {
                 </>
               ) : 'Sign In'}
             </Button>
+            <OAuth/>
           </form>
           <div className='flex text-sm mt-5 gap-2'>
             <span>Do not have an account?</span>
