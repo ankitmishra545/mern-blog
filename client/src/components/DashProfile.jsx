@@ -1,11 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Button, TextInput } from 'flowbite-react'
+import { Alert, Button, Modal, TextInput } from 'flowbite-react'
 import { useEffect, useRef, useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice';
+import { HiOutlineExclamationCircle } from 'react-icons/hi'
 
 const DashProfile = () => {
 
@@ -21,6 +22,7 @@ const DashProfile = () => {
   const [updateUserSuccess, setUpdateUserSuccess] = useState(false);
   const [updateUserError, setUpdateUserError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showModel, setShowModel] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -104,6 +106,12 @@ const DashProfile = () => {
     }
   }
 
+  const handleDeleteUser = async(e) => {
+    setShowModel(false);
+    const res = await fetch(`/api/delete/:${currentUser._id}`);
+    const data = await res.json();
+  };
+
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 font-semibold text-center text-3xl'>Profile</h1>
@@ -133,7 +141,7 @@ const DashProfile = () => {
         <Button type='submit' gradientDuoTone='purpleToBlue' outline>Update</Button>
       </form>
       <div className='flex justify-between mt-5 text-red-500'>
-        <span className='cursor-pointer'>Delete Account</span>
+        <span onClick={() => setShowModel(true)} className='cursor-pointer'>Delete Account</span>
         <span className='cursor-pointer'>Sign Out</span>
       </div>
       {updateUserSuccess && (
@@ -142,6 +150,19 @@ const DashProfile = () => {
       {updateUserError && (
         <Alert color='failure' className='mt-5'>{updateUserError}</Alert>
       )}
+      <Modal show={showModel} onClose={() => setShowModel(false)} popup size='md'>
+        <Modal.Header/>
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className='w-14 h-14 mb-4 text-gray-400 dark:text-gray-200 mx-auto'/>
+            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Are, you sure you want to delete your account? </h3>
+            <div className='flex justify-center gap-4'>
+              <Button color='failure' onClick={handleDeleteUser}>Yes, I'm sure</Button>
+              <Button color='gray' onClick={() => setShowModel(false)}>No, cancel</Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }
