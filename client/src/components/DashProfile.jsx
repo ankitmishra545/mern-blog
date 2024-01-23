@@ -5,13 +5,13 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice';
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice';
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
 
 const DashProfile = () => {
 
   const dispatch = useDispatch();
-  const {currentUser} = useSelector(state => state.user);
+  const {currentUser, loading, error} = useSelector(state => state.user);
 
   const filePickerRef = useRef();
   const [imageFile, setImageFile] = useState(null);
@@ -108,8 +108,20 @@ const DashProfile = () => {
 
   const handleDeleteUser = async(e) => {
     setShowModel(false);
-    const res = await fetch(`/api/delete/:${currentUser._id}`);
-    const data = await res.json();
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/delete/:${currentUser._id}`,{
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(deleteUserFailure(data.message));
+      }else{
+        dispatch(deleteUserSuccess(data));
+      }      
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
   };
 
   return (
@@ -149,6 +161,9 @@ const DashProfile = () => {
       )}
       {updateUserError && (
         <Alert color='failure' className='mt-5'>{updateUserError}</Alert>
+      )}
+      {error && (
+        <Alert color='failure' className='mt-5'>{error}</Alert>
       )}
       <Modal show={showModel} onClose={() => setShowModel(false)} popup size='md'>
         <Modal.Header/>
