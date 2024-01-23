@@ -7,6 +7,7 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutSuccess, updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice';
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
+import { Link } from 'react-router-dom';
 
 const DashProfile = () => {
 
@@ -166,7 +167,10 @@ const DashProfile = () => {
         <TextInput type='text' id='username' placeholder='Username' defaultValue={currentUser.username} onChange={handleChange}/>
         <TextInput type='email' id='email' placeholder='Email' defaultValue={currentUser.email} onChange={handleChange}/>
         <TextInput type='password' id='password' placeholder='Password' onChange={handleChange}/>
-        <Button type='submit' gradientDuoTone='purpleToBlue' outline>Update</Button>
+        <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled={loading || imageFileUploading}>{loading ? 'Loading...' : 'Update'}</Button>
+        <Link to='/create-post'>
+          <Button type='button' gradientDuoTone='purpleToPink' className='w-full'>Create a post</Button>
+        </Link>
       </form>
       <div className='flex justify-between mt-5 text-red-500'>
         <span onClick={() => setShowModel(true)} className='cursor-pointer'>Delete Account</span>
