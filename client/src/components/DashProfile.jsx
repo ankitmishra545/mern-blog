@@ -23,7 +23,7 @@ const DashProfile = () => {
   const [updateUserSuccess, setUpdateUserSuccess] = useState(false);
   const [updateUserError, setUpdateUserError] = useState(false);
   const [formData, setFormData] = useState({});
-  const [showModel, setShowModel] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -108,7 +108,7 @@ const DashProfile = () => {
   }
 
   const handleDeleteUser = async(e) => {
-    setShowModel(false);
+    setShowModal(false);
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`/api/delete/:${currentUser._id}`,{
@@ -173,7 +173,7 @@ const DashProfile = () => {
         </Link>
       </form>
       <div className='flex justify-between mt-5 text-red-500'>
-        <span onClick={() => setShowModel(true)} className='cursor-pointer'>Delete Account</span>
+        <span onClick={() => setShowModal(true)} className='cursor-pointer'>Delete Account</span>
         <span onClick={handleSignOut} className='cursor-pointer'>Sign Out</span>
       </div>
       {updateUserSuccess && (
@@ -185,7 +185,7 @@ const DashProfile = () => {
       {error && (
         <Alert color='failure' className='mt-5'>{error}</Alert>
       )}
-      <Modal show={showModel} onClose={() => setShowModel(false)} popup size='md'>
+      <Modal show={showModal} onClose={() => setShowModal(false)} popup size='md'>
         <Modal.Header/>
         <Modal.Body>
           <div className="text-center">
@@ -193,7 +193,7 @@ const DashProfile = () => {
             <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Are, you sure you want to delete your account? </h3>
             <div className='flex justify-center gap-4'>
               <Button color='failure' onClick={handleDeleteUser}>Yes, I'm sure</Button>
-              <Button color='gray' onClick={() => setShowModel(false)}>No, cancel</Button>
+              <Button color='gray' onClick={() => setShowModal(false)}>No, cancel</Button>
             </div>
           </div>
         </Modal.Body>
