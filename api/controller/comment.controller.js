@@ -4,17 +4,17 @@ import { errorHandler } from "../utils/error.js";
 export const createComment = async(req, res, next) => {
     try {
         const { content, postId, userId} = req.body;
-
+        
         if(req.user.id !== userId){
             return next(errorHandler(403, 'You are not allowed to add this comment'));
         }
-
+        
         const newComment = new Comment({
             content,
             postId,
             userId
         });
-
+        
         await newComment.save();
 
         res.status(200).json(newComment);
@@ -23,3 +23,17 @@ export const createComment = async(req, res, next) => {
         next(error);
     }
 };
+
+export const getPostComments = async(req, res, next) => {
+    try {
+        const comments = await Comment.find({postId: req.params.postId}).sort({
+            createdAt: -1
+        });
+        if(!comments){
+            return res.status(200).json('Be first to comment on this post!');
+        }
+        res.status(200).json(comments);
+    } catch (error) {
+        next(error);
+    }
+}
