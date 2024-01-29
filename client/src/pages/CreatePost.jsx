@@ -67,7 +67,7 @@ const CreatePost = () => {
                 },
                 body: JSON.stringify(formData)
             });
-            const data = res.json();
+            const data = await res.json();
             if(!res.ok){
                 setPublishError(data.message);
                 return;
