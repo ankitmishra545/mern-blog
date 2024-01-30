@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { FaThumbsUp } from "react-icons/fa"
-import { Button, Textarea } from "flowbite-react"
+import { Button, Modal, Textarea } from "flowbite-react"
 import moment from "moment"
+import { HiOutlineExclamationCircle } from "react-icons/hi"
 
-const Comment = ({comment, onLike, onEdit}) => {
+const Comment = ({comment, onLike, onEdit, onDelete}) => {
 
     const [user, setUser] = useState({});
     const [isEditing, setIsEditing] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [editedComment, setEditedComment] = useState(comment.content);
     const { currentUser } = useSelector(state => state.user);
 
@@ -85,8 +87,26 @@ const Comment = ({comment, onLike, onEdit}) => {
                         {comment.numberOfLikes > 0 && comment.numberOfLikes + ' ' + (comment.numberOfLikes === 1 ? 'like' : 'likes')}
                     </p>
                     {currentUser && (currentUser._id === comment.userId || currentUser.isAdmin) && (
+                        <div className="flex gap-2">
                         <button type="button" onClick={handleEdit} className="text-gray-400 hover:text-blue-500">Edit</button>
+                        <button type="button" 
+                        onClick={() => setShowModal(true)}
+                        className="text-gray-400 hover:text-red-500">Delete</button>
+                        </div>
                     )}
+                    <Modal show={showModal} onClose={() => setShowModal(false)} popup size='md'>
+                        <Modal.Header/>
+                        <Modal.Body>
+                          <div className="text-center">
+                            <HiOutlineExclamationCircle className='w-14 h-14 mb-4 text-gray-400                 dark:text-gray-200 mx-auto'/>
+                            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Are, you sure you want to delete this comment? </h3>
+                            <div className='flex justify-center gap-4'>
+                              <Button color='failure' onClick={() => onDelete(comment._id)}>Yes, I'm sure</Button>
+                              <Button color='gray' onClick={() => setShowModal(false)}>No, cancel</Button>
+                            </div>
+                          </div>
+                        </Modal.Body>
+                    </Modal>
                 </div>
                 </>
             )}
