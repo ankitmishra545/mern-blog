@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Button, Modal, Table } from "flowbite-react";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Table } from "flowbite-react";
+import ModalDeleteButton from "./shared/ModalDeleteButton";
 
 const DashComments = () => {
   const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [commentIdToDelete, setCommentIdToDelete] = useState("");
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -17,17 +16,20 @@ const DashComments = () => {
         const res = await fetch(`/api/comment/getComments`);
         const data = await res.json();
         if (res.ok) {
+          setLoading(false);
           setComments(data.comments);
           if (data.comments.length < 9) {
             setShowMore(false);
           }
         }
       } catch (error) {
+        setLoading(false);
         console.log(error.message);
       }
     };
 
     if (currentUser.isAdmin) {
+      setLoading(true);
       fetchComments();
     }
   }, [currentUser._id]);
@@ -51,8 +53,7 @@ const DashComments = () => {
     }
   };
 
-  const handleDeleteComment = async (e) => {
-    setShowModal(false);
+  const handleDeleteComment = async (commentIdToDelete) => {
     try {
       const res = await fetch(
         `/api/comment/deleteComment/${commentIdToDelete}`,
@@ -72,6 +73,10 @@ const DashComments = () => {
       console.log(error.message);
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
@@ -100,15 +105,12 @@ const DashComments = () => {
                   <Table.Cell>{comment.postId}</Table.Cell>
                   <Table.Cell>{comment.userId}</Table.Cell>
                   <Table.Cell>
-                    <span
-                      onClick={() => {
-                        setShowModal(true);
-                        setCommentIdToDelete(comment._id);
-                      }}
-                      className="font-medium text-red-500 hover:underline cursor-pointer"
-                    >
-                      Delete
-                    </span>
+                    <ModalDeleteButton
+                      buttonStyle="font-medium text-red-500 hover:underline cursor-pointer"
+                      deletingMessage="comment"
+                      idToDelete={comment._id}
+                      onDelete={handleDeleteComment}
+                    />
                   </Table.Cell>
                 </Table.Row>
               ))}
@@ -126,30 +128,6 @@ const DashComments = () => {
       ) : (
         <p>You have no comments yet!</p>
       )}
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        popup
-        size="md"
-      >
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiOutlineExclamationCircle className="w-14 h-14 mb-4 text-gray-400 dark:text-gray-200 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-              Are, you sure you want to delete this comment?{" "}
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDeleteComment}>
-                Yes, I'm sure
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
     </div>
   );
 };

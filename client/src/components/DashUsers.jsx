@@ -6,6 +6,7 @@ import ModalDeleteButton from "./shared/ModalDeleteButton";
 
 const DashUsers = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(true);
 
   const { currentUser } = useSelector((state) => state.user);
@@ -17,17 +18,20 @@ const DashUsers = () => {
         const data = await res.json();
         if (res.ok) {
           setUsers(data.users);
+          setLoading(false);
           if (data.users.length < 9) {
             setShowMore(false);
           }
         }
       } catch (error) {
+        setLoading(false);
         console.log(error.message);
       }
     };
 
     if (currentUser.isAdmin) {
       fetchUsers();
+      setLoading(true);
     }
   }, [currentUser._id]);
 
@@ -63,18 +67,28 @@ const DashUsers = () => {
     }
   };
 
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  const tableHeadCellValue = [
+    "Date created",
+    "User image",
+    "Username",
+    "Email",
+    "Admin",
+    "Delete",
+  ];
+
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
       {currentUser.isAdmin && users.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
             <Table.Head>
-              <Table.HeadCell>Date created</Table.HeadCell>
-              <Table.HeadCell>User image</Table.HeadCell>
-              <Table.HeadCell>Username</Table.HeadCell>
-              <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Admin</Table.HeadCell>
-              <Table.HeadCell>Delete</Table.HeadCell>
+              {tableHeadCellValue.map((cellValue) => (
+                <Table.HeadCell key={cellValue}>{cellValue}</Table.HeadCell>
+              ))}
             </Table.Head>
             <Table.Body>
               {users.map((user) => (
@@ -123,7 +137,7 @@ const DashUsers = () => {
           )}
         </>
       ) : (
-        <p>You have no post yet!</p>
+        <p>You have no users yet!</p>
       )}
     </div>
   );

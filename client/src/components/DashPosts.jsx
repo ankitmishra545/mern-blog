@@ -7,6 +7,7 @@ import ModalDeleteButton from "./shared/ModalDeleteButton";
 const DashPosts = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -16,17 +17,20 @@ const DashPosts = () => {
         const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
         const data = await res.json();
         if (res.ok) {
+          setLoading(false);
           setUserPosts(data.posts);
           if (data.posts.length < 9) {
             setShowMore(false);
           }
         }
       } catch (error) {
+        setLoading(false);
         console.log(error.message);
       }
     };
 
     if (currentUser.isAdmin) {
+      setLoading(true);
       fetchPosts();
     }
   }, [currentUser._id]);
@@ -70,6 +74,10 @@ const DashPosts = () => {
       console.log(error.message);
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
